@@ -1,5 +1,5 @@
-use serde_json::Value;
 use serde::Deserialize;
+use serde_json::Value;
 
 #[derive(Deserialize, Debug)]
 pub struct History {
@@ -7,18 +7,18 @@ pub struct History {
 }
 
 #[derive(Deserialize, Debug)]
-struct Chats {
+pub struct Chats {
     list: Vec<Chat>,
 }
 
 #[derive(Deserialize, Debug)]
-struct Chat {
+pub struct Chat {
     name: String,
     messages: Vec<Message>,
 }
 
 #[derive(Deserialize, Debug)]
-struct Message {
+pub struct Message {
     from: Option<String>,
     actor: Option<String>,
     text: Value,
@@ -32,18 +32,34 @@ impl Message {
     }
 
     fn get_text(&self) -> String {
-        // TODO
-        return String::from("123");
+        return match &self.text {
+            Value::String(s) => s.clone(),
+            Value::Array(objects) => {
+                let strings: Vec<String> = objects
+                    .iter()
+                    .map(|value| {
+                        return match value {
+                            Value::String(s) => s.clone(),
+                            Value::Object(object_map) => {
+                                object_map["text"].as_str().unwrap().to_string()
+                            }
+                            _ => panic!("Unexpected Value enum type inside Value::Array"),
+                        };
+                    })
+                    .collect();
+                return strings.join("");
+            }
+            _ => panic!("Unexpected Value enum type"),
+        };
     }
 
     fn get_text_length(&self) -> usize {
-        // TODO
-        return self.get_text().len();
+        self.get_text().len()
     }
 }
 
 #[cfg(test)]
-mod message_tests {
+mod message_get_author_tests {
     use super::*;
     use serde_json::Value::String as ValueString;
 
@@ -78,5 +94,67 @@ mod message_tests {
             text: ValueString(String::new()),
         };
         message.get_author();
+    }
+}
+
+#[cfg(test)]
+mod message_get_text_tests {
+    use super::*;
+    use serde_json::Map;
+    use serde_json::Value::Array;
+    use serde_json::Value::Object;
+    use serde_json::Value::String as ValueString;
+
+    #[test]
+    fn single_string_text_should_be_returned() {
+        let text = String::from("single-string-text");
+        let message = Message {
+            from: None,
+            actor: None,
+            text: ValueString(text.clone()),
+        };
+        assert_eq!(text, message.get_text());
+    }
+
+    #[test]
+    fn multipart_text_should_be_concatenated_and_returned_as_whole() {
+        let text1 = String::from("a");
+        let text2 = String::from("b");
+        let text3 = String::from("c");
+        let mut object_map = Map::new();
+        object_map.insert(String::from("text"), ValueString(text2.clone()));
+        let message = Message {
+            from: None,
+            actor: None,
+            text: Array(vec![
+                ValueString(text1.clone()),
+                Object(object_map),
+                ValueString(text3.clone()),
+            ]),
+        };
+
+        let mut result = String::new();
+        result.push_str(&text1);
+        result.push_str(&text2);
+        result.push_str(&text3);
+
+        assert_eq!(message.get_text(), result);
+    }
+}
+
+#[cfg(test)]
+mod message_get_text_length_tests {
+    use super::*;
+    use serde_json::Value::String as ValueString;
+
+    #[test]
+    fn should_return_correct_length() {
+        let text = String::from("single-string-text");
+        let message = Message {
+            from: None,
+            actor: None,
+            text: ValueString(text.clone()),
+        };
+        assert_eq!(text.len(), message.get_text_length());
     }
 }
