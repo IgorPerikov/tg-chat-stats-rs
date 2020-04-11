@@ -7,7 +7,7 @@ pub struct History {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct Chats {
+struct Chats {
     list: Vec<Chat>,
 }
 
@@ -55,6 +55,22 @@ impl Message {
 
     pub fn get_text_length(&self) -> usize {
         self.get_text().chars().count()
+    }
+}
+
+impl History {
+    pub fn get_chats(&self) -> &Vec<Chat> {
+        return &self.chats.list;
+    }
+}
+
+impl Chat {
+    pub fn get_name(&self) -> &String {
+        return &self.name;
+    }
+
+    pub fn get_messages(&self) -> &Vec<Message> {
+        return &self.messages;
     }
 }
 
