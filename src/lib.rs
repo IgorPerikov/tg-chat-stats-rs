@@ -22,6 +22,7 @@ pub struct Message {
     from: Option<String>,
     actor: Option<String>,
     text: Value,
+    action: Option<String>,
 }
 
 impl Message {
@@ -56,6 +57,10 @@ impl Message {
     pub fn get_text_length(&self) -> usize {
         self.get_text().chars().count()
     }
+
+    pub fn not_an_action(&self) -> bool {
+        self.action.is_none()
+    }
 }
 
 impl History {
@@ -86,6 +91,7 @@ mod message_get_author_tests {
             from: Some(from.clone()),
             actor: None,
             text: ValueString(String::new()),
+            action: None,
         };
         assert_eq!(from, *message.get_author().unwrap());
     }
@@ -97,6 +103,7 @@ mod message_get_author_tests {
             from: None,
             actor: Some(actor.clone()),
             text: ValueString(String::new()),
+            action: None,
         };
         assert_eq!(actor, *message.get_author().unwrap());
     }
@@ -107,6 +114,7 @@ mod message_get_author_tests {
             from: None,
             actor: None,
             text: ValueString(String::new()),
+            action: None,
         };
         assert!(message.get_author().is_none());
     }
@@ -127,6 +135,7 @@ mod message_get_text_tests {
             from: None,
             actor: None,
             text: ValueString(text.clone()),
+            action: None,
         };
         assert_eq!(text, message.get_text());
     }
@@ -146,6 +155,7 @@ mod message_get_text_tests {
                 Object(object_map),
                 ValueString(text3.clone()),
             ]),
+            action: None,
         };
 
         let mut result = String::new();
@@ -169,6 +179,7 @@ mod message_get_text_length_tests {
             from: None,
             actor: None,
             text: ValueString(text.clone()),
+            action: None,
         };
         assert_eq!(5, message.get_text_length());
     }
@@ -180,6 +191,7 @@ mod message_get_text_length_tests {
             from: None,
             actor: None,
             text: ValueString(text.clone()),
+            action: None,
         };
         assert_eq!(6, message.get_text_length());
     }

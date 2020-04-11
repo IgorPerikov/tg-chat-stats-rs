@@ -6,7 +6,7 @@ use tg_chat_stats::{Chat, History};
 // TODO: print all chat names in a separate cli command
 // TODO: support chats exclusion/inclusion
 fn main() {
-    let stats_file_path = "stats.json"; // TODO: cli argument
+    let stats_file_path = "result.json"; // TODO: cli argument
     let example_json = fs::read_to_string(stats_file_path).unwrap();
     let history: History = serde_json::from_str(&example_json).unwrap();
     history
@@ -19,6 +19,7 @@ fn analyze_chat(chat: &Chat) {
     let mut actor_to_letters = HashMap::new();
     chat.get_messages()
         .iter()
+        .filter(|message| message.not_an_action())
         .filter(|message| message.get_author().is_some())
         .for_each(|message| {
             let x = actor_to_letters
