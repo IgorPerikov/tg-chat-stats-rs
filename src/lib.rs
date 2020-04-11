@@ -53,8 +53,8 @@ impl Message {
         };
     }
 
-    fn get_text_length(&self) -> usize {
-        self.get_text().len()
+    pub fn get_text_length(&self) -> usize {
+        self.get_text().chars().count()
     }
 }
 
@@ -149,12 +149,23 @@ mod message_get_text_length_tests {
 
     #[test]
     fn should_return_correct_length() {
-        let text = String::from("single-string-text");
+        let text = String::from("hello");
         let message = Message {
             from: None,
             actor: None,
             text: ValueString(text.clone()),
         };
-        assert_eq!(text.len(), message.get_text_length());
+        assert_eq!(5, message.get_text_length());
+    }
+
+    #[test]
+    fn should_return_text_length_based_on_number_of_chars_not_bytes() {
+        let text = String::from("привет");
+        let message = Message {
+            from: None,
+            actor: None,
+            text: ValueString(text.clone()),
+        };
+        assert_eq!(6, message.get_text_length());
     }
 }
