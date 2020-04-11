@@ -2,7 +2,7 @@ use serde_json::Value;
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
-pub struct Stats {
+pub struct History {
     chats: Chats,
 }
 
@@ -43,7 +43,7 @@ impl Message {
 }
 
 #[cfg(test)]
-mod tests {
+mod message_tests {
     use super::*;
     use serde_json::Value::String as ValueString;
 
