@@ -25,10 +25,10 @@ pub struct Message {
 }
 
 impl Message {
-    fn get_author(&self) -> &String {
+    pub fn get_author(&self) -> Option<&String> {
         let from_field = self.from.as_ref();
         let actor_field = self.actor.as_ref();
-        return from_field.or(actor_field).unwrap();
+        return from_field.or(actor_field);
     }
 
     fn get_text(&self) -> String {
@@ -71,7 +71,7 @@ mod message_get_author_tests {
             actor: None,
             text: ValueString(String::new()),
         };
-        assert_eq!(from, *message.get_author());
+        assert_eq!(from, *message.get_author().unwrap());
     }
 
     #[test]
@@ -82,18 +82,17 @@ mod message_get_author_tests {
             actor: Some(actor.clone()),
             text: ValueString(String::new()),
         };
-        assert_eq!(actor, *message.get_author());
+        assert_eq!(actor, *message.get_author().unwrap());
     }
 
     #[test]
-    #[should_panic]
-    fn absence_of_from_and_actor_should_lead_to_panic() {
+    fn from_and_actor_absence_should_return_none() {
         let message = Message {
             from: None,
             actor: None,
             text: ValueString(String::new()),
         };
-        message.get_author();
+        assert!(message.get_author().is_none());
     }
 }
 
