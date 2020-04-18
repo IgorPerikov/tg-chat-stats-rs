@@ -12,7 +12,7 @@ fn main() {
     history
         .get_chats()
         .iter()
-        .for_each(|chat| analyze_chat(chat)); // TODO: make it multithreaded per chat
+        .for_each(|chat| analyze_chat(chat));
 }
 
 fn analyze_chat(chat: &Chat) {

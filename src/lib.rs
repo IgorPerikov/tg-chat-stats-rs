@@ -79,6 +79,8 @@ impl Chat {
     }
 }
 
+
+
 #[cfg(test)]
 mod message_get_author_tests {
     use super::*;
