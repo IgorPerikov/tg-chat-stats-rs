@@ -1,7 +1,9 @@
 use itertools::Itertools;
-use std::collections::HashMap;
 use std::fs;
-use tg_chat_stats::{Chat, History};
+use tg_chat_stats::{History, Chat};
+use crate::util::count_letters_by_actor;
+
+mod util;
 
 // TODO: print all chat names in a separate cli command
 // TODO: support chats exclusion/inclusion
@@ -16,17 +18,7 @@ fn main() {
 }
 
 fn analyze_chat(chat: &Chat) {
-    let mut actor_to_letters = HashMap::new();
-    chat.get_messages()
-        .iter()
-        .filter(|message| message.not_an_action())
-        .filter(|message| message.get_author().is_some())
-        .for_each(|message| {
-            let x = actor_to_letters
-                .entry(message.get_author().unwrap().as_str())
-                .or_insert(0);
-            *x += message.get_text_length();
-        });
+    let actor_to_letters = count_letters_by_actor(chat);
     println!("Chat: {}", chat.get_name());
     actor_to_letters
         .iter()
