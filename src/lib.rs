@@ -23,6 +23,7 @@ pub struct Message {
     actor: Option<String>,
     text: Value,
     action: Option<String>,
+    forwarded_from: Option<String>,
 }
 
 impl Message {
@@ -32,7 +33,7 @@ impl Message {
         return from_field.or(actor_field);
     }
 
-    fn get_text(&self) -> String {
+    pub fn get_text(&self) -> String {
         return match &self.text {
             Value::String(s) => s.clone(),
             Value::Array(objects) => {
@@ -59,7 +60,7 @@ impl Message {
     }
 
     pub fn not_an_action(&self) -> bool {
-        self.action.is_none()
+        self.action.is_none() && self.forwarded_from.is_none()
     }
 }
 
@@ -94,6 +95,7 @@ mod message_get_author_tests {
             actor: None,
             text: ValueString(String::new()),
             action: None,
+            forwarded_from: None,
         };
         assert_eq!(from, *message.get_author().unwrap());
     }
@@ -106,6 +108,7 @@ mod message_get_author_tests {
             actor: Some(actor.clone()),
             text: ValueString(String::new()),
             action: None,
+            forwarded_from: None,
         };
         assert_eq!(actor, *message.get_author().unwrap());
     }
@@ -117,6 +120,7 @@ mod message_get_author_tests {
             actor: None,
             text: ValueString(String::new()),
             action: None,
+            forwarded_from: None,
         };
         assert!(message.get_author().is_none());
     }
@@ -138,6 +142,7 @@ mod message_get_text_tests {
             actor: None,
             text: ValueString(text.clone()),
             action: None,
+            forwarded_from: None,
         };
         assert_eq!(text, message.get_text());
     }
@@ -158,6 +163,7 @@ mod message_get_text_tests {
                 ValueString(text3.clone()),
             ]),
             action: None,
+            forwarded_from: None,
         };
 
         let mut result = String::new();
@@ -182,6 +188,7 @@ mod message_get_text_length_tests {
             actor: None,
             text: ValueString(text.clone()),
             action: None,
+            forwarded_from: None,
         };
         assert_eq!(5, message.get_text_length());
     }
@@ -194,6 +201,7 @@ mod message_get_text_length_tests {
             actor: None,
             text: ValueString(text.clone()),
             action: None,
+            forwarded_from: None,
         };
         assert_eq!(6, message.get_text_length());
     }

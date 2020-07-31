@@ -7,6 +7,7 @@ pub fn count_letters_by_actor(chat: &Chat) -> HashMap<&str, usize> {
         .iter()
         .filter(|message| message.not_an_action())
         .filter(|message| message.get_author().is_some())
+        .filter(|message| !message.get_text().starts_with("#botd"))
         .for_each(|message| {
             let x = actor_to_letters
                 .entry(message.get_author().unwrap().as_str())
